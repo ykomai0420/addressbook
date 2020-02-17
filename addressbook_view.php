@@ -137,14 +137,14 @@ if (!empty($_POST['sel_reset'])) {
       <?php
       foreach ((array)$val as $output) { ?>
       <tr>
-        <td><?php print $output['id']; ?></td>
-        <td><?php print $output['name']; ?></td>
-        <td><?php print $output['furigana']; ?></td>
-        <td><?php print $output['mail_address']; ?></td>
-        <td><?php print $output['sex']; ?></td>
-        <td><?php print $output['age']; ?></td>
-        <td><?php print $output['prefectures']; ?></td>
-        <td><?php print $output['phone_number']; ?></td>
+        <td><?php print $cls->e($output['id']); ?></td>
+        <td><?php print $cls->e($output['name']); ?></td>
+        <td><?php print $cls->e($output['furigana']); ?></td>
+        <td><?php print $cls->e($output['mail_address']); ?></td>
+        <td><?php print $cls->e($output['sex']); ?></td>
+        <td><?php print $cls->e($output['age']); ?></td>
+        <td><?php print $cls->e($output['prefectures']); ?></td>
+        <td><?php print $cls->e($output['phone_number']); ?></td>
         <form method="POST" action="addressbook_view.php">
           <input type="hidden" name="del_id" value="<?php print $output['id']; ?>">
           <td><input type="submit" name="delete" value="削除"></td>
