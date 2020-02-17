@@ -3,9 +3,12 @@ require_once 'addressbook.php';
 
 $err = new errors();
 $cls = new addressbook();
-if (empty($err->errorCheck())) {
-  $cls->inputDb();
-  print '送信しました。';
+if (empty($err->errorCheck2())) {
+  $cls->deleteDb();
+  print '削除しました。';
+}
+if (!empty($_POST['sel_reset'])) {
+  $cls->outputDb();
 }
 ?>
 <!DOCTYPE html>
@@ -22,44 +25,33 @@ if (empty($err->errorCheck())) {
     ul {
       list-style :none;
     }
-    .errors {
-      color :#ff0000;
+    th {
+      background-color :#000080;
+      color :#ffffff;
     }
     </style>
   </head>
   <body>
-    <h1>addressbook</h1>
-    <h2>入力フォーム</h2>
-    <p>必要情報を入力してください</p>
+  <h1>addressbook</h1>
+  <a href="http://yuya1225.xsrv.jp/learning/addressbook/addressbook_input.php">入力フォームへ</a>
+  <h2>情報一覧</h2>
+  <form method="POST" action="addressbook_view.php">
     <ul>
-    <?php if (isset($_POST['submit'])) { ?>
-      <?php foreach ((array)$err->errorCheck() as $value) { ?>
-      <li class="errors">
-        <?php print $value ?>
+      <li>
+        <label>名前:<input type="text" name="sel_name"></label>
       </li>
-      <?php } ?>
-    <?php } ?>
-    </ul>
-    <form method="POST" action="addressbook_input.php">
-      <ul>
-        <li>
-          <label>名前:<input type="text" name="name"></label>
-        </li>
-        <li>
-          <label>ふりがな:<input type="text" name="furigana"></label>
-        </li>
-        <li>
-          <label>メールアドレス:<input type="text" name="mail_address"></label>
-        </li>
-        <li>
-          <label>性別:<input type="radio" name="sex" value="男">男</label>
-          <label><input type="radio" name="sex" value="女">女</label>
-        </li>
-        <li>
-          <label>年齢:<input type="text" name="age"></label>
-        </li>
-        <li>
-          <label>都道府県:<select name="prefectures">
+      <li>
+        <label>メールアドレス:<input type="text" name="sel_mail_address"></label>
+      </li>
+      <li>
+        <label>性別:<input type="radio" name="sel_sex" value="男">男</label>
+        <label><input type="radio" name="sel_sex" value="女">女</label>
+      </li>
+      <li>
+        <label>年齢:<input type="text" name="sel_age"></label>
+      </li>
+      <li>
+      <label>都道府県:<select name="sel_prefectures">
             <option value="">選択してください</option>
             <option value="東京都">東京都</option>
             <option value="北海道">北海道</option>
@@ -109,18 +101,65 @@ if (empty($err->errorCheck())) {
             <option value="鹿児島県">鹿児島県</option>
             <option value="沖縄県">沖縄県</option>
           </select></label>
-        </li>
-        <li>
-          <label>電話番号:<input type="tel" name="phone_number"></label>
-        </li>
-        <li>
-          <input type="submit" name="submit" value="送信">
-        </li>
-        <li>
-          <input type="reset" name="reset" value="リセット">
-        </li>
-      </ul>
-    </form>
-    <a href="http://localhost/selfphp/addressbook/addressbook_view.php">情報一覧へ</a>
+      </li>
+      <li>
+        <label>電話番号:<input type="tel" name="sel_phone_number"></label>
+      </li>
+      <li>
+        <input type="submit" name="sel_submit" value="検索">
+      </li>
+      <li>
+        <input type="submit" name="sel_reset" value="リセット">
+      </li>
+    </ul>
+  </form>
+    <table border="1">
+    <?php
+      if (empty($err->errorCheck)) {
+        $val = $cls->outputDb();
+      }
+      if (!empty($_POST['sel_submit'])) {
+        $val = $cls->selectDb();
+      }
+      ?>
+      <tr>
+        <th>ID</th>
+        <th>名前</th>
+        <th>ふりがな</th>
+        <th>メールアドレス</th>
+        <th>性別</th>
+        <th>年齢</th>
+        <th>都道府県</th>
+        <th>電話番号</th>
+        <th>削除</th>
+        <th>変更</th>
+      </tr>
+      <?php
+      foreach ((array)$val as $output) { ?>
+      <tr>
+        <td><?php print $output['id']; ?></td>
+        <td><?php print $output['name']; ?></td>
+        <td><?php print $output['furigana']; ?></td>
+        <td><?php print $output['mail_address']; ?></td>
+        <td><?php print $output['sex']; ?></td>
+        <td><?php print $output['age']; ?></td>
+        <td><?php print $output['prefectures']; ?></td>
+        <td><?php print $output['phone_number']; ?></td>
+        <form method="POST" action="addressbook_view.php">
+          <input type="hidden" name="del_id" value="<?php print $output['id']; ?>">
+          <td><input type="submit" name="delete" value="削除"></td>
+        </form>
+        <form method="POST" action="addressbook_view.php">
+          <input type="hidden" name="up_id" value="<?php print $output['id']; ?>">
+          <td><input type="submit" name="update" value="変更"
+          formaction="http://yuya1225.xsrv.jp/learning/addressbook/addressbook_crud.php"></td>
+        </form>
+      </tr>
+      <?php } ?>
+    </table>
+    <?php 
+    for ($i = 1; $i <= $cls->pageDb(); $i++) {
+      print '<a href="http://yuya1225.xsrv.jp/learning/addressbook/addressbook_view.php?page='. $i. '">'. "\t". $i. "\t". '</a>';
+    } ?>
   </body>
 </html>
